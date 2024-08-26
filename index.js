@@ -10,7 +10,7 @@ import {
   Shape,
   Path,
   LinearGradient,
-} from '@react-native-community/art';
+} from 'react-native-svg';
 import TinyColor from 'tinycolor2';
 
 const styles = StyleSheet.create({
