@@ -5,12 +5,8 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { StyleSheet, View, PanResponder, Animated } from 'react-native';
-import {
-  Surface,
-  Shape,
-  Path,
-  LinearGradient,
-} from 'react-native-svg';
+import { Svg, Path,LinearGradient } from 'react-native-svg';
+
 import TinyColor from 'tinycolor2';
 
 const styles = StyleSheet.create({
@@ -632,39 +628,38 @@ export default class TimeInterval extends PureComponent {
       for (let i = 1; i < points.length; i += 1) {
         const a = points[i - 1];
         const b = points[i];
-        const path = new Path();
-        path.moveTo(a.in.x, a.in.y);
-        path
-          .arcTo(
-            b.in.x,
-            b.in.y,
-            arcRadius - lineWidth / 2,
-            arcRadius - lineWidth / 2,
-          )
-          .lineTo(b.out.x, b.out.y);
-        path.counterArcTo(
-          a.out.x,
-          a.out.y,
-          arcRadius + lineWidth / 2,
-          arcRadius + lineWidth / 2,
-        );
+        const arc = `
+          M ${a.in.x} ${a.in.y}
+          A ${arcRadius - lineWidth / 2}, ${arcRadius - lineWidth / 2}, 0, 0, 1, ${b.in.x}, ${b.in.y}
+          L ${b.out.x}, ${b.out.y}
+          A ${arcRadius + lineWidth / 2}, ${arcRadius + lineWidth / 2}, 0, 0, 0, ${a.out.x}, ${a.out.y}
+          Z
+        `;
 
         const distance = distanceBetweenPoints(a.in, b.in);
         if (distance > 0.1 || (i > 1 && i < points.length - 1)) {
+          const gradientId = `gradient-${i}`;
           result.push({
-            id: `gradient-${i}`,
-            arc: path.close(),
-            fill: new LinearGradient(
-              {
-                '0': getRatioColor(elapsedDistance / totalDistance),
-                '1': getRatioColor(
-                  (elapsedDistance + distance) / totalDistance,
-                ),
-              },
-              `${a.in.x}`,
-              `${a.in.y}`,
-              `${b.in.x}`,
-              `${b.in.y}`,
+            id:i,
+            arc,
+            fill: `url(${gradientId})`,
+            gradient: (
+            <LinearGradient 
+              key={gradientId}
+              id={gradientId}
+              x1={`${a.in.x}`} 
+              y1={`${a.in.y}`} 
+              x2={`${b.in.x}`} 
+              y2={`${b.in.y}`}>
+                <Stop 
+                  offset="0" 
+                  stopColor={getRatioColor(elapsedDistance / totalDistance)}  
+                  stopOpacity="1"/>
+                <Stop 
+                  offset="1" 
+                  stopColor={getRatioColor((elapsedDistance + distance) / totalDistance)} 
+                    stopOpacity="1"/>
+            </LinearGradient>
             ),
           });
         }
@@ -677,41 +672,26 @@ export default class TimeInterval extends PureComponent {
     const filteredSides = sides.filter(
       s => distanceBetweenPoints(s.in, arcStop.in) > 0.1,
     );
-    const path = new Path();
-    path.moveTo(arcStart.in.x, arcStart.in.y);
-    filteredSides.forEach(s =>
-      path.arcTo(
-        s.in.x,
-        s.in.y,
-        arcRadius - lineWidth / 2,
-        arcRadius - lineWidth / 2,
-      ),
-    );
-    path
-      .arcTo(
-        arcStop.in.x,
-        arcStop.in.y,
-        arcRadius - lineWidth / 2,
-        arcRadius - lineWidth / 2,
-      )
-      .lineTo(arcStop.out.x, arcStop.out.y);
-    filteredSides
-      .reverse()
-      .forEach(s =>
-        path.counterArcTo(
-          s.out.x,
-          s.out.y,
-          arcRadius + lineWidth / 2,
-          arcRadius + lineWidth / 2,
-        ),
-      );
-    path.counterArcTo(
-      arcStart.out.x,
-      arcStart.out.y,
-      arcRadius + lineWidth / 2,
-      arcRadius + lineWidth / 2,
-    );
-    return [{ id: 'simple', arc: path.close(), fill: lineColor }];
+    let arc = `M ${arcStart.in.x} ${arcStart.in.y}`;
+
+    // Add arcs for each side in filteredSides
+    filteredSides.forEach(s => {
+      arc += ` A ${arcRadius - lineWidth / 2}, ${arcRadius - lineWidth / 2}, 0, 0, 1, ${s.in.x}, ${s.in.y}`;
+    });
+
+    // Add arc and line to arcStop
+    arc += ` A ${arcRadius - lineWidth / 2}, ${arcRadius - lineWidth / 2}, 0, 0, 1, ${arcStop.in.x}, ${arcStop.in.y}`;
+    arc += ` L ${arcStop.out.x}, ${arcStop.out.y}`;
+
+    // Add reverse arcs for each side in reversed filteredSides
+    filteredSides.reverse().forEach(s => {
+      arc += ` A ${arcRadius + lineWidth / 2}, ${arcRadius + lineWidth / 2}, 0, 0, 0, ${s.out.x}, ${s.out.y}`;
+    });
+
+    // Add final arc to arcStart
+    arc += ` A ${arcRadius + lineWidth / 2}, ${arcRadius + lineWidth / 2}, 0, 0, 0, ${arcStart.out.x}, ${arcStart.out.y}`;
+
+    return [{ id: 'simple', arc, fill: lineColor }];
   }
 
   /**
@@ -767,11 +747,14 @@ export default class TimeInterval extends PureComponent {
         ]}
       >
         <View style={styles.arc} {...this.turningPanResponder.panHandlers}>
-          <Surface width={componentSize} height={componentSize}>
+          <Svg width={componentSize} height={componentSize}>
+            <Defs>
+              {this.updateArc().flatMap(a=>a.gradient).filter(x=>x)}  
+            </Defs>
             {this.updateArc().map(({ id, arc, fill }) => (
-              <Shape key={id} d={arc} fill={fill} />
+              <Path key={id} d={arc} fill={fill} />
             ))}
-          </Surface>
+          </Svg>
         </View>
 
         <Animated.View
