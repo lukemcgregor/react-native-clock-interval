@@ -5,7 +5,7 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { StyleSheet, View, PanResponder, Animated } from 'react-native';
-import { Svg, Path,LinearGradient } from 'react-native-svg';
+import { Svg, Path,LinearGradient, Defs } from 'react-native-svg';
 
 import TinyColor from 'tinycolor2';
 
