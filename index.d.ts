@@ -14,7 +14,7 @@ export interface Time {
 	 * @type {number}
 	 * @memberof Time
 	 */
-	hour: number
+	hour: number;
 
 	/**
 	 * Minutes (0-59)
@@ -22,7 +22,7 @@ export interface Time {
 	 * @type {number}
 	 * @memberof Time
 	 */
-	minute: number
+	minute: number;
 }
 
 /**
@@ -39,7 +39,7 @@ export interface TimeIntervalPropTypes {
 	 * @type {number}
 	 * @memberof TimeIntervalPropTypes
 	 */
-	componentSize: number
+	componentSize: number;
 
 	/**
 	 * Width and height of the indicator
@@ -47,7 +47,7 @@ export interface TimeIntervalPropTypes {
 	 * @type {number}
 	 * @memberof TimeIntervalPropTypes
 	 */
-	indicatorSize: number
+	indicatorSize: number;
 
 	/**
 	 * Thickness of the arc
@@ -55,7 +55,7 @@ export interface TimeIntervalPropTypes {
 	 * @type {number}
 	 * @memberof TimeIntervalPropTypes
 	 */
-	lineWidth: number
+	lineWidth: number;
 
 	/**
 	 * Color of the arc line
@@ -63,7 +63,7 @@ export interface TimeIntervalPropTypes {
 	 * @type {string}
 	 * @memberof TimeIntervalPropTypes
 	 */
-	lineColor: string | Array<string>
+	lineColor: string | Array<string>;
 
 	/**
 	 * Initial starting time
@@ -71,7 +71,7 @@ export interface TimeIntervalPropTypes {
 	 * @type {Time}
 	 * @memberof TimeIntervalPropTypes
 	 */
-	start: Time
+	start: Time;
 
 	/**
 	 * Initial ending time
@@ -79,7 +79,7 @@ export interface TimeIntervalPropTypes {
 	 * @type {Time}
 	 * @memberof TimeIntervalPropTypes
 	 */
-	stop: Time
+	stop: Time;
 
 	/**
 	 * Whether user interaction is disabled
@@ -88,7 +88,7 @@ export interface TimeIntervalPropTypes {
 	 * @memberof TimeIntervalPropTypes
 	 * @default false
 	 */
-	disabled?: boolean
+	disabled?: boolean;
 
 	/**
 	 * Whether dragging the arc line is enabled
@@ -97,7 +97,7 @@ export interface TimeIntervalPropTypes {
 	 * @memberof TimeIntervalPropTypes
 	 * @default true
 	 */
-	allowLineDrag?: boolean
+	allowLineDrag?: boolean;
 
 	/**
 	 * Interaction step (minutes)
@@ -106,7 +106,7 @@ export interface TimeIntervalPropTypes {
 	 * @memberof TimeIntervalPropTypes
 	 * @default 1
 	 */
-	step?: number
+	step?: number;
 
 	/**
 	 * Called in the end of interaction
@@ -114,7 +114,7 @@ export interface TimeIntervalPropTypes {
 	 * @type {function}
 	 * @memberof TimeIntervalPropTypes
 	 */
-	onRelease(start: Time, stop: Time): void
+	onRelease(start: Time, stop: Time): void;
 
 	/**
 	 * Called on every change during interaction
@@ -122,7 +122,7 @@ export interface TimeIntervalPropTypes {
 	 * @type {function}
 	 * @memberof TimeIntervalPropTypes
 	 */
-	onChange?(start: Time, stop: Time): void
+	onChange?(start: Time, stop: Time): void;
 
 	/**
 	 * Defines a component to display as start indicator
@@ -130,7 +130,7 @@ export interface TimeIntervalPropTypes {
 	 * @type {function}
 	 * @memberof TimeIntervalPropTypes
 	 */
-	startIndicator?(): React.ReactNode
+	startIndicator?(): React.ReactNode;
 
 	/**
 	 * Defines a component to display as stop indicator
@@ -138,7 +138,7 @@ export interface TimeIntervalPropTypes {
 	 * @type {function}
 	 * @memberof TimeIntervalPropTypes
 	 */
-	stopIndicator?(): React.ReactNode
+	stopIndicator?(): React.ReactNode;
 }
 
 export default class TimeInterval extends React.Component<TimeIntervalPropTypes> { }

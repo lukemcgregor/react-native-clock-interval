@@ -5,7 +5,7 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { StyleSheet, View, PanResponder, Animated } from 'react-native';
-import { Svg, Path,LinearGradient, Defs } from 'react-native-svg';
+import { Svg, Path,LinearGradient, Defs, Stop } from 'react-native-svg';
 
 import TinyColor from 'tinycolor2';
 
@@ -151,11 +151,11 @@ export default class TimeInterval extends PureComponent {
     this.updateArc = this.updateArc.bind(this);
     this.updateIndicators = this.updateIndicators.bind(this);
     this.reportUpdate = this.reportUpdate.bind(this);
+    this.reset =  this.reset.bind(this);
 
-    const setTimes = { start: props.start, stop: props.stop };
     this.state = {
-      ...setTimes,
-      setTimes,
+      start: props.start,
+      stop: props.stop,
       startPosition: { x: 0, y: 0 },
       stopPosition: { x: 0, y: 0 },
     };
@@ -371,25 +371,6 @@ export default class TimeInterval extends PureComponent {
     ) {
       this.updateIndicators({ start, stop });
     }
-  }
-
-  /**
-   * Get derived state from properties
-   * @param {*} nextProps New props
-   * @param {*} prevState Current state
-   * @returns {object} new state
-   */
-  static getDerivedStateFromProps({ start, stop }, state) {
-    if (
-      start.hour !== state.setTimes.start.hour ||
-      start.minute !== state.setTimes.start.minute ||
-      stop.hour !== state.setTimes.stop.hour ||
-      stop.minute !== state.setTimes.stop.minute
-    ) {
-      return { start, stop, setTimes: { start, stop } };
-    }
-
-    return null;
   }
 
   /**
@@ -644,22 +625,25 @@ export default class TimeInterval extends PureComponent {
             arc,
             fill: `url(${gradientId})`,
             gradient: (
-            <LinearGradient 
-              key={gradientId}
-              id={gradientId}
-              x1={`${a.in.x}`} 
-              y1={`${a.in.y}`} 
-              x2={`${b.in.x}`} 
-              y2={`${b.in.y}`}>
+              <LinearGradient 
+                key={gradientId}
+                id={gradientId}
+                x1={`${a.in.x}`} 
+                y1={`${a.in.y}`} 
+                x2={`${b.in.x}`} 
+                y2={`${b.in.y}`}
+              >
                 <Stop 
                   offset="0" 
                   stopColor={getRatioColor(elapsedDistance / totalDistance)}  
-                  stopOpacity="1"/>
+                  stopOpacity="1"
+                />
                 <Stop 
                   offset="1" 
                   stopColor={getRatioColor((elapsedDistance + distance) / totalDistance)} 
-                    stopOpacity="1"/>
-            </LinearGradient>
+                  stopOpacity="1"
+                />
+              </LinearGradient>
             ),
           });
         }
@@ -720,6 +704,19 @@ export default class TimeInterval extends PureComponent {
       this.lastReportedStop = stop;
       this.props.onChange(start, stop);
     }
+  }
+
+  reset(start, stop) {
+    const startPosition = this.timeToindicatorPosition(start);
+    const stopPosition = this.timeToindicatorPosition(stop);
+    const s = {
+      start,
+      stop,
+      startPosition,
+      stopPosition,
+    }
+    this.setState(s);
+    this.updateIndicators(s);
   }
 
   /**
